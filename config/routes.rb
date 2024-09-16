@@ -9,7 +9,12 @@ Rails.application.routes.draw do
   # root "posts#index"
   resources :entities, only: [ :index, :show, :create, :update, :destroy ]
 
-  resources :stocks, only: [ :index, :show, :create, :update, :destroy ]
+  resources :stocks, only: [ :index, :show, :create, :update, :destroy ] do
+    collection do
+      get "search"
+    end
+  end
+
 
   resources :wallets, only: [ :show ] do
     member do

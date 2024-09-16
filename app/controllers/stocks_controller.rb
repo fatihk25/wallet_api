@@ -33,6 +33,31 @@ class StocksController < ApplicationController
     render json: { message: "Delete successful" }
   end
 
+  def search
+     if params[:api_key].blank? || (params[:identifier].blank? && params[:identifiers].blank?)
+      render json: { error: "API key and at least one identifier are required" }, status: :bad_request
+      return
+     end
+
+    stock_service = LatestStockPrice::StockService.new(params[:api_key])
+
+    if params[:identifier]
+      result = stock_service.price(params[:identifier])
+    elsif params[:identifiers]
+      identifiers = params[:identifiers].split(",")
+      result = stock_service.prices(identifiers)
+    else
+      render json: { error: "Please provide an identifier or identifiers for searching" }, status: :bad_request
+      return
+    end
+
+    if result.present?
+      render json: result
+    else
+      render json: { message: "No stocks found" }, status: :not_found
+    end
+  end
+
   private
 
   def set_stock
